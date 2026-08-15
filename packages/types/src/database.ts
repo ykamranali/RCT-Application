@@ -701,3 +701,42 @@ export type TicketInsert = Insert<
 export type TicketUpdate = Update<Ticket>;
 export type CustomerInsert = Insert<Customer, 'country' | 'status' | 'customer_type'>;
 export type BranchInsert = Insert<Branch, 'country' | 'status' | 'is_head_office'>;
+
+export interface PartCatalogue {
+  id: UUID;
+  part_code: string;
+  name: string;
+  description: string | null;
+  unit: string;
+  unit_cost: number | null;
+  currency: string;
+  is_active: boolean;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+}
+
+export interface ServiceReport {
+  id: UUID;
+  report_number: string;
+  ticket_id: UUID;
+  customer_id: UUID;
+  branch_id: UUID | null;
+  engineer_id: UUID | null;
+  snapshot: Json;
+  complaint_summary: string | null;
+  diagnosis: string | null;
+  work_performed: string | null;
+  engineer_remarks: string | null;
+  customer_remarks: string | null;
+  parts_summary: Json;
+  service_started_at: Timestamp | null;
+  arrival_at: Timestamp | null;
+  completion_at: Timestamp | null;
+  total_minutes: number | null;
+  customer_signature_id: UUID | null;
+  status: 'draft' | 'pending_signature' | 'signed' | 'voided';
+  pdf_url: string | null;
+  generated_at: Timestamp | null;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+}

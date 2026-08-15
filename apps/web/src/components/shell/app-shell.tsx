@@ -24,7 +24,8 @@ export function AppShell({
   return (
     <div className="min-h-dvh bg-background">
       <div className="lg:pl-[260px]">
-        <header className="glass sticky top-0 z-30 flex h-14 items-center gap-3 border-b px-4 sm:px-6">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b px-4 sm:px-6">
+          <div className="glass absolute inset-0 -z-10" />
           {/*
             Sidebar renders its own mobile trigger inline plus a `fixed`
             drawer, so mounting it here puts the hamburger in the top bar

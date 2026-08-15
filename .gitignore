@@ -21,3 +21,6 @@ ios/
 *.keystore
 !debug.keystore
 supabase/.temp/
+
+# Local Netlify folder
+.netlify

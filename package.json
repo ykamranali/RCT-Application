@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "description": "RCT Application - Service Management System for Ram Computer Technology LLC",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "npm run dev --workspace=@rct/web",
     "build": "npm run build --workspace=@rct/web",
@@ -16,5 +19,10 @@
     "db:seed": "psql \"$DATABASE_URL\" -f supabase/seed/seed.sql",
     "mobile": "npm run start --workspace=@rct/mobile"
   },
-  "engines": { "node": ">=20.0.0" }
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "pg": "^8.23.0"
+  }
 }

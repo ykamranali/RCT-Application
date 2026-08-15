@@ -13,7 +13,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#0F172A"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "android": {
       "package": "com.rct.application",
       "versionCode": 1,
@@ -25,7 +27,11 @@
         "CAMERA",
         "ACCESS_FINE_LOCATION",
         "READ_MEDIA_IMAGES",
-        "POST_NOTIFICATIONS"
+        "POST_NOTIFICATIONS",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ],
       "blockedPermissions": [
         "ACCESS_BACKGROUND_LOCATION",
@@ -43,12 +49,29 @@
     },
     "plugins": [
       "expo-router",
-      ["expo-camera", { "cameraPermission": "Take photographs of the equipment you are servicing." }],
-      ["expo-location", { "locationAlwaysAndWhenInUsePermission": "Record your arrival on site against the ticket." }]
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Take photographs of the equipment you are servicing."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Record your arrival on site against the ticket."
+        }
+      ]
     ],
     "extra": {
       "supabaseUrl": "$EXPO_PUBLIC_SUPABASE_URL",
-      "supabaseAnonKey": "$EXPO_PUBLIC_SUPABASE_ANON_KEY"
-    }
+      "supabaseAnonKey": "$EXPO_PUBLIC_SUPABASE_ANON_KEY",
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d2cd8aa6-90d7-41f8-9b35-ac29091fc1e7"
+      }
+    },
+    "owner": "ykamranali"
   }
 }

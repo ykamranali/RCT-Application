@@ -207,3 +207,178 @@ export async function getBranchesForCustomer(customerId: string) {
     .order('branch_name');
   return data ?? [];
 }
+
+export interface CustomerFilters {
+  status?: string;
+  type?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+  sort?: 'name' | 'newest';
+}
+
+export async function listCustomers(filters: CustomerFilters = {}) {
+  const supabase = await createServerSupabase();
+  const limit = Math.min(filters.limit ?? 25, 100);
+  const offset = filters.offset ?? 0;
+
+  let query = supabase.from('v_customer_summary').select('*', { count: 'exact' });
+
+  if (filters.status) query = query.eq('status', filters.status);
+  if (filters.type) query = query.eq('customer_type', filters.type);
+
+  if (filters.search?.trim()) {
+    const term = `%${filters.search.trim()}%`;
+    query = query.or(`company_name.ilike.${term},customer_code.ilike.${term}`);
+  }
+
+  if (filters.sort === 'newest') {
+    // Note: v_customer_summary doesn't have created_at, but customer_id works if uuid is v7, but we can just use code desc.
+    query = query.order('customer_code', { ascending: false });
+  } else {
+    query = query.order('company_name', { ascending: true });
+  }
+
+  const { data, count, error } = await query.range(offset, offset + limit - 1);
+
+  return {
+    customers: (data as import('@rct/types').CustomerSummary[] | null) ?? [],
+    total: count ?? 0,
+    error: error?.message ?? null,
+  };
+}
+
+export async function getCustomer(id: string) {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase
+    .from('customers')
+    .select('*')
+    .eq('id', id)
+    .single();
+  return data as import('@rct/types').Customer | null;
+}
+
+export async function listEngineers() {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from('employees')
+    .select('*')
+    .eq('role', 'engineer')
+    .order('full_name', { ascending: true });
+  return { engineers: data as import('@rct/types').Employee[] | null ?? [], error: error?.message };
+}
+
+export async function getEngineer(id: string) {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase
+    .from('employees')
+    .select('*')
+    .eq('id', id)
+    .single();
+  return data as import('@rct/types').Employee | null;
+}
+
+export async function listUsers() {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .order('full_name', { ascending: true });
+  return { users: data as import('@rct/types').Profile[] | null ?? [], error: error?.message };
+}
+
+export async function getUserProfile(id: string) {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', id)
+    .single();
+  return data as import('@rct/types').Profile | null;
+}
+
+export async function listAmcs() {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from('v_amc_expiring')
+    .select('*')
+    .order('expiry_date', { ascending: true });
+  return { amcs: data as import('@rct/types').AmcExpiring[] | null ?? [], error: error?.message };
+}
+
+export async function getAmc(id: string) {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase
+    .from('amc_contracts')
+    .select('*')
+    .eq('id', id)
+    .single();
+  return data as import('@rct/types').AmcContract | null;
+}
+
+export async function listSlaPlans() {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase
+    .from('sla_plans')
+    .select('id, name')
+    .eq('is_active', true)
+    .order('name');
+  return data as { id: string; name: string }[] | null ?? [];
+}
+
+export async function listAssets() {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from('assets')
+    .select('*, customers(company_name), branches(branch_name)')
+    .order('asset_tag', { ascending: true });
+  return { assets: data as any[] | null ?? [], error: error?.message };
+}
+
+export async function getAsset(id: string) {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase
+    .from('assets')
+    .select('*')
+    .eq('id', id)
+    .single();
+  return data as import('@rct/types').Asset | null;
+}
+
+export async function listParts() {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from('parts_catalogue')
+    .select('*')
+    .order('part_code', { ascending: true });
+  return { parts: data as import('@rct/types').PartCatalogue[] | null ?? [], error: error?.message };
+}
+
+export async function getPart(id: string) {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase
+    .from('parts_catalogue')
+    .select('*')
+    .eq('id', id)
+    .single();
+  return data as import('@rct/types').PartCatalogue | null;
+}
+
+export async function listReports() {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from('service_reports')
+    .select('*, tickets(title), customers(company_name), employees(full_name)')
+    .order('created_at', { ascending: false });
+  return { reports: data as any[] | null ?? [], error: error?.message };
+}
+
+export async function getReport(id: string) {
+  const supabase = await createServerSupabase();
+  const { data } = await supabase
+    .from('service_reports')
+    .select('*, tickets(title), customers(company_name), employees(full_name)')
+    .eq('id', id)
+    .single();
+  return data as any | null;
+}
