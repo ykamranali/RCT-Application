@@ -1,0 +1,20 @@
+{
+  "name": "rct-application",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RCT Application - Service Management System for Ram Computer Technology LLC",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "npm run dev --workspace=@rct/web",
+    "build": "npm run build --workspace=@rct/web",
+    "start": "npm run start --workspace=@rct/web",
+    "lint": "npm run lint --workspace=@rct/web",
+    "typecheck": "npm run typecheck --workspace=@rct/web",
+    "test": "npm run test --workspace=@rct/web",
+    "db:push": "supabase db push",
+    "db:reset": "supabase db reset",
+    "db:seed": "psql \"$DATABASE_URL\" -f supabase/seed/seed.sql",
+    "mobile": "npm run start --workspace=@rct/mobile"
+  },
+  "engines": { "node": ">=20.0.0" }
+}

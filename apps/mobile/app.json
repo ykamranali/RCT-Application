@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "RCT Application",
+    "slug": "rct-application",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "rctapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F172A"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "android": {
+      "package": "com.rct.application",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F172A"
+      },
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "READ_MEDIA_IMAGES",
+        "POST_NOTIFICATIONS"
+      ],
+      "blockedPermissions": [
+        "ACCESS_BACKGROUND_LOCATION",
+        "RECORD_AUDIO"
+      ]
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rct.application",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Take before and after photographs of the equipment you are servicing.",
+        "NSLocationWhenInUseUsageDescription": "Record your arrival on site against the ticket. Location is only captured when you tap a site-visit button.",
+        "NSPhotoLibraryUsageDescription": "Attach an existing photograph to a ticket."
+      }
+    },
+    "plugins": [
+      "expo-router",
+      ["expo-camera", { "cameraPermission": "Take photographs of the equipment you are servicing." }],
+      ["expo-location", { "locationAlwaysAndWhenInUsePermission": "Record your arrival on site against the ticket." }]
+    ],
+    "extra": {
+      "supabaseUrl": "$EXPO_PUBLIC_SUPABASE_URL",
+      "supabaseAnonKey": "$EXPO_PUBLIC_SUPABASE_ANON_KEY"
+    }
+  }
+}

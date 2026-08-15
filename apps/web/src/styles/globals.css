@@ -1,0 +1,231 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =====================================================================
+   RCT Application - theme tokens
+
+   Light theme: near-white surfaces with a cool cast, so the saturated
+   brand blue and the status colours carry all of the visual weight.
+   Dark theme: deep navy rather than neutral grey, which keeps the brand
+   identity intact after dark and reduces halation on large screens.
+   ===================================================================== */
+
+@layer base {
+  :root {
+    --background: 210 40% 99%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* RCT brand blue */
+    --primary: 214 84% 34%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 214 32% 95%;
+    --secondary-foreground: 222 47% 20%;
+
+    --muted: 214 32% 96%;
+    --muted-foreground: 215 18% 46%;
+
+    --accent: 214 32% 94%;
+    --accent-foreground: 222 47% 20%;
+
+    --destructive: 0 72% 46%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 26% 90%;
+    --input: 214 26% 88%;
+    --ring: 214 84% 34%;
+
+    --success: 152 62% 33%;
+    --success-foreground: 0 0% 100%;
+    --success-soft: 152 62% 95%;
+
+    --warning: 35 92% 43%;
+    --warning-foreground: 0 0% 100%;
+    --warning-soft: 40 96% 94%;
+
+    --danger: 0 72% 46%;
+    --danger-foreground: 0 0% 100%;
+    --danger-soft: 0 86% 96%;
+
+    --info: 214 84% 42%;
+    --info-foreground: 0 0% 100%;
+    --info-soft: 214 90% 96%;
+
+    /* Application shell */
+    --sidebar: 222 47% 11%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-muted: 215 20% 62%;
+    --sidebar-accent: 214 84% 52%;
+    --sidebar-border: 217 33% 20%;
+
+    --shadow-color: 222 47% 20%;
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 210 40% 96%;
+
+    --card: 222 44% 11%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 222 44% 12%;
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 213 90% 58%;
+    --primary-foreground: 222 47% 8%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 96%;
+
+    --muted: 217 33% 16%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 217 33% 18%;
+    --accent-foreground: 210 40% 96%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 20%;
+    --input: 217 33% 22%;
+    --ring: 213 90% 58%;
+
+    --success: 152 55% 45%;
+    --success-foreground: 222 47% 8%;
+    --success-soft: 152 40% 16%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 222 47% 8%;
+    --warning-soft: 38 60% 16%;
+
+    --danger: 0 72% 58%;
+    --danger-foreground: 222 47% 8%;
+    --danger-soft: 0 50% 18%;
+
+    --info: 213 90% 60%;
+    --info-foreground: 222 47% 8%;
+    --info-soft: 213 60% 17%;
+
+    --sidebar: 222 50% 6%;
+    --sidebar-foreground: 210 40% 94%;
+    --sidebar-muted: 215 20% 58%;
+    --sidebar-accent: 213 90% 60%;
+    --sidebar-border: 217 33% 16%;
+
+    --shadow-color: 222 60% 2%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Tabular figures everywhere numbers are compared down a column. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    @apply bg-primary/20;
+  }
+
+  /* Visible focus for keyboard users, invisible for pointer users. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Frosted panel used by the top bar and command palette. */
+  .glass {
+    @apply bg-card/70 backdrop-blur-xl backdrop-saturate-150;
+  }
+
+  .surface-card {
+    @apply rounded-lg border bg-card text-card-foreground shadow-card;
+  }
+
+  /* Skeleton shimmer for loading states. */
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-muted;
+  }
+  .skeleton::after {
+    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-foreground/[0.06] to-transparent;
+    content: '';
+  }
+
+  /* Status chip base - colour is applied by the StatusBadge component. */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-border;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  /* Hide from view but keep for assistive technology. */
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    @apply sr-only;
+  }
+}
+
+/* The signature pad must not scroll the page while being drawn on. */
+.signature-canvas {
+  touch-action: none;
+  cursor: crosshair;
+}
+
+/* Print: service reports and ticket detail should print cleanly. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+}

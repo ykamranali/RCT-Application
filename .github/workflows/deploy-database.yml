@@ -1,0 +1,70 @@
+name: Deploy database to Supabase
+
+# Applies the migrations to a real Supabase project.
+#
+# Add DATABASE_URL as a repository secret first:
+#   Settings → Secrets and variables → Actions → New repository secret
+#   Supabase → Project Settings → Database → Connection string (URI)
+#
+# Deliberately manual: pushing schema changes to production should be a
+# decision, not a side effect of merging.
+on:
+  workflow_dispatch:
+    inputs:
+      seed_demo_data:
+        description: 'Also load demo data (DELETES existing customers and tickets)'
+        type: boolean
+        default: false
+
+jobs:
+  migrate:
+    name: Apply migrations
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Check the connection
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL secret is not set."
+            exit 1
+          fi
+          psql "$DATABASE_URL" -c 'select version()' >/dev/null
+          echo "Connected."
+
+      - name: Apply migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          for f in supabase/migrations/*.sql; do
+            echo "==> $(basename "$f")"
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -f "$f"
+          done
+          echo "All migrations applied."
+
+      - name: Verify security posture
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          unprotected=$(psql "$DATABASE_URL" -tAc \
+            "select count(*) from pg_tables where schemaname='public' and not rowsecurity")
+          policies=$(psql "$DATABASE_URL" -tAc \
+            "select count(*) from pg_policies where schemaname in ('public','storage')")
+          echo "Tables without RLS: $unprotected"
+          echo "Security policies:  $policies"
+          test "$unprotected" = "0" || { echo "::error::Some tables have RLS disabled."; exit 1; }
+
+      - name: Load demo data
+        if: ${{ inputs.seed_demo_data }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "::warning::Loading demo data - existing customers and tickets are deleted."
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -f supabase/seed/seed.sql

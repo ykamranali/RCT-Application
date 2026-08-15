@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  web:
+    name: Type-check and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Production build
+        run: npm run build
+        env:
+          # Build-time placeholders. Real values live in the Vercel project;
+          # the build only needs these to satisfy env validation.
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key-for-build-only
+          NEXT_PUBLIC_APP_URL: https://example.com
+
+  database:
+    name: Database migrations and tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rct_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports: ['5432:5432']
+
+    env:
+      PGPASSWORD: postgres
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rct_test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Install the local Supabase shim
+        # Recreates auth.users, auth.uid() and the storage schema so the real
+        # migrations can run against plain PostgreSQL.
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/00_local_supabase_shim.sql
+
+      - name: Apply migrations
+        run: |
+          for f in supabase/migrations/*.sql; do
+            echo "==> $(basename "$f")"
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -f "$f"
+          done
+
+      - name: Verify Row Level Security is enabled everywhere
+        run: |
+          count=$(psql "$DATABASE_URL" -tAc \
+            "select count(*) from pg_tables where schemaname='public' and not rowsecurity")
+          echo "tables without RLS: $count"
+          test "$count" = "0"
+
+      - name: Load seed data
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -f supabase/seed/seed.sql
+
+      - name: SLA and workflow suite
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/01_sla_and_workflow.sql
+
+      - name: Row Level Security suite
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/02_rls_isolation.sql
