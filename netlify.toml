@@ -1,11 +1,7 @@
 [build]
-  # Build from the root of the monorepo so dependencies install correctly
-  command = "npm run build --workspace=@rct/web"
-  publish = "apps/web/.next"
+  base = "apps/web"
+  command = "npm run build"
+  publish = ".next"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-  [plugins.inputs]
-    # Tell the Next.js plugin where the actual app lives
-    baseDirectory = "apps/web"
