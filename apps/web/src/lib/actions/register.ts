@@ -87,7 +87,7 @@ export async function registerUser(data: {
           full_name: data.full_name,
           phone: data.phone || null,
           role: data.role as UserRole,
-          is_active: false, // Engineers need admin approval
+          is_active: true, // Now active by default per user request
           must_change_password: !data.password,
           customer_id: null,
         });
@@ -117,7 +117,7 @@ export async function registerUser(data: {
       await supabase.from('profiles').update({ employee_id: employeeId }).eq('id', userId);
     }
 
-    return { success: true, needsApproval: data.role === 'engineer' };
+    return { success: true, needsApproval: false };
   } catch (error: any) {
     console.error('Registration failed:', error);
     // Best effort cleanup
