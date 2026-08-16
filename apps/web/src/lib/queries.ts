@@ -368,7 +368,7 @@ export async function listReports() {
   const supabase = await createServerSupabase();
   const { data, error } = await supabase
     .from('service_reports')
-    .select('*, tickets(title), customers(company_name), employees(full_name)')
+    .select('*, tickets(subject), customers(company_name), employees(full_name)')
     .order('created_at', { ascending: false });
   return { reports: data as any[] | null ?? [], error: error?.message };
 }
@@ -377,7 +377,7 @@ export async function getReport(id: string) {
   const supabase = await createServerSupabase();
   const { data } = await supabase
     .from('service_reports')
-    .select('*, tickets(title), customers(company_name), employees(full_name)')
+    .select('*, tickets(subject), customers(company_name), employees(full_name)')
     .eq('id', id)
     .single();
   return data as any | null;

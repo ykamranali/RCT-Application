@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 type ReportWithRelations = ServiceReport & {
-  tickets?: { title: string };
+  tickets?: { subject: string };
   customers?: { company_name: string };
   employees?: { full_name: string };
 };
@@ -50,8 +50,8 @@ export function ReportTable({ reports }: { reports: ReportWithRelations[] }) {
                     >
                       {r.report_number}
                     </Link>
-                    <p className="text-xs text-muted-foreground truncate max-w-[250px]" title={r.tickets?.title}>
-                      {r.tickets?.title || 'Unknown Ticket'}
+                    <p className="text-xs text-muted-foreground truncate max-w-[250px]" title={r.tickets?.subject}>
+                      {r.tickets?.subject || 'Unknown Ticket'}
                     </p>
                   </div>
                 </div>
