@@ -41,7 +41,7 @@ export function navigationForRole(role: UserRole): NavSection[] {
       {
         label: 'Account',
         items: [
-          { label: 'Notifications', href: '/portal/notifications', icon: Bell, badgeKey: 'unread' },
+          { label: 'Notifications', href: '/notifications', icon: Bell, badgeKey: 'unread' },
           { label: 'Profile', href: '/profile', icon: UserCog },
         ],
       },

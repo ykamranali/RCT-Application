@@ -17,17 +17,25 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-export function AssetTable({ assets }: { assets: (Asset & { customers: { company_name: string } })[] }) {
+export function AssetTable({ 
+  assets, 
+  hideActions = false, 
+  hideCustomer = false 
+}: { 
+  assets: (Asset & { customers: { company_name: string } })[];
+  hideActions?: boolean;
+  hideCustomer?: boolean;
+}) {
   return (
     <div className="overflow-x-auto">
       <Table className="min-w-[800px]">
         <TableHeader>
           <TableRow>
             <TableHead>Asset</TableHead>
-            <TableHead>Customer</TableHead>
+            {!hideCustomer && <TableHead>Customer</TableHead>}
             <TableHead>Model / S.N.</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            {!hideActions && <TableHead className="text-right">Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -49,9 +57,11 @@ export function AssetTable({ assets }: { assets: (Asset & { customers: { company
                   </div>
                 </div>
               </TableCell>
-              <TableCell>
-                {a.customers?.company_name || '-'}
-              </TableCell>
+              {!hideCustomer && (
+                <TableCell>
+                  {a.customers?.company_name || '-'}
+                </TableCell>
+              )}
               <TableCell>
                 <div className="text-sm">
                   <div>{a.manufacturer || '-'} {a.model}</div>
@@ -69,25 +79,27 @@ export function AssetTable({ assets }: { assets: (Asset & { customers: { company
                   {a.status}
                 </Badge>
               </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link href={`/assets/${a.id}`}><Edit className="h-4 w-4" /></Link>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-danger hover:text-danger hover:bg-danger/10"
-                    onClick={async () => {
-                      if (confirm('Are you sure you want to delete this asset? This action cannot be undone.')) {
-                        await deleteAsset(a.id);
-                      }
-                    }}
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
+              {!hideActions && (
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button variant="ghost" size="icon" asChild>
+                      <Link href={`/assets/${a.id}`}><Edit className="h-4 w-4" /></Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-danger hover:text-danger hover:bg-danger/10"
+                      onClick={async () => {
+                        if (confirm('Are you sure you want to delete this asset? This action cannot be undone.')) {
+                          await deleteAsset(a.id);
+                        }
+                      }}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>

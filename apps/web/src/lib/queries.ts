@@ -382,3 +382,13 @@ export async function getReport(id: string) {
     .single();
   return data as any | null;
 }
+
+export async function listNotifications(profileId: string) {
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('profile_id', profileId)
+    .order('created_at', { ascending: false });
+  return { notifications: data as any[] | null ?? [], error: error?.message };
+}
