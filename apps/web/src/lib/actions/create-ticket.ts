@@ -30,9 +30,9 @@ const schema = z.object({
     .trim()
     .min(10, 'Describe the problem in a little more detail (at least 10 characters)')
     .max(10_000),
-  categoryId: z.string().uuid('Choose a category'),
+  categoryId: z.string({ required_error: 'Choose a category' }).uuid('Choose a category'),
   subcategoryId: z.string().uuid().nullable().optional(),
-  priorityId: z.string().uuid('Choose a priority'),
+  priorityId: z.string({ required_error: 'Choose a priority' }).uuid('Choose a priority'),
   branchId: z.string().uuid().nullable().optional(),
   contactPerson: z.string().trim().max(160).optional(),
   contactPhone: z.string().trim().max(40).optional(),
@@ -119,6 +119,7 @@ export async function createTicket(input: unknown): Promise<CreateTicketResult> 
     if (error.message.includes('row-level security')) {
       return { ok: false, message: 'You do not have permission to raise a ticket for that company.' };
     }
+    console.error('Failed to create ticket:', error);
     return { ok: false, message: 'Unable to create ticket. Please try again.' };
   }
 

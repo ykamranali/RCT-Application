@@ -103,7 +103,7 @@ export function navigationForRole(role: UserRole): NavSection[] {
       items: [
         { label: 'Users', href: '/admin/users', icon: Users },
         { label: 'Settings', href: '/admin/settings', icon: Cog },
-        { label: 'Email templates', href: '/admin/email', icon: MessageSquare },
+        { label: 'Email templates', href: '/admin/settings/email-templates', icon: MessageSquare },
         { label: 'Service catalogue', href: '/admin/catalogue', icon: Boxes },
         { label: 'Audit log', href: '/admin/audit', icon: ScrollText },
       ],

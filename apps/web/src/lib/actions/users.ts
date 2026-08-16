@@ -7,9 +7,19 @@ import type { Profile } from '@rct/types';
 
 export async function updateUser(id: string, data: Partial<Profile>) {
   await requireAdmin();
-  const supabase = await createServerSupabase();
+  const supabaseAdmin = createAdminSupabase();
 
-  const { error } = await supabase
+  if (data.email) {
+    const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(id, {
+      email: data.email,
+    });
+    if (authError) {
+      console.error('Error updating auth email:', authError);
+      return { error: authError.message };
+    }
+  }
+
+  const { error } = await supabaseAdmin
     .from('profiles')
     .update(data)
     .eq('id', id);
@@ -71,12 +81,15 @@ export async function createUser(data: {
 
 export async function deleteUser(id: string) {
   await requireAdmin();
-  const supabaseAdmin = await createAdminSupabase();
+  const supabaseAdmin = createAdminSupabase();
 
   const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
 
   if (error) {
     console.error('Error deleting user:', error);
+    if (error.message.includes('foreign key') || error.message.includes('violates foreign key constraint')) {
+      return { error: 'This user has associated records (like tickets) and cannot be deleted. Please disable their account instead.' };
+    }
     return { error: error.message };
   }
 
