@@ -22,9 +22,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* RCT brand blue */
-    --primary: 214 84% 34%;
-    --primary-foreground: 210 40% 98%;
+    /* RCT brand colors (Red & Green from Logo) */
+    --primary: 355 78% 30%; /* Dark red/maroon */
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 214 32% 95%;
     --secondary-foreground: 222 47% 20%;
@@ -59,11 +59,11 @@
     --info-soft: 214 90% 96%;
 
     /* Application shell */
-    --sidebar: 222 47% 11%;
-    --sidebar-foreground: 210 40% 96%;
-    --sidebar-muted: 215 20% 62%;
-    --sidebar-accent: 214 84% 52%;
-    --sidebar-border: 217 33% 20%;
+    --sidebar: 355 60% 12%; /* Very dark maroon for sidebar */
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-muted: 355 20% 60%;
+    --sidebar-accent: 355 78% 30%;
+    --sidebar-border: 355 30% 20%;
 
     --shadow-color: 222 47% 20%;
     --radius: 0.625rem;
@@ -79,8 +79,8 @@
     --popover: 222 44% 12%;
     --popover-foreground: 210 40% 96%;
 
-    --primary: 213 90% 58%;
-    --primary-foreground: 222 47% 8%;
+    --primary: 355 80% 45%; /* Lighter red for dark mode */
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 96%;
@@ -114,11 +114,11 @@
     --info-foreground: 222 47% 8%;
     --info-soft: 213 60% 17%;
 
-    --sidebar: 222 50% 6%;
-    --sidebar-foreground: 210 40% 94%;
-    --sidebar-muted: 215 20% 58%;
-    --sidebar-accent: 213 90% 60%;
-    --sidebar-border: 217 33% 16%;
+    --sidebar: 355 60% 8%;
+    --sidebar-foreground: 0 0% 94%;
+    --sidebar-muted: 355 20% 58%;
+    --sidebar-accent: 355 80% 45%;
+    --sidebar-border: 355 30% 16%;
 
     --shadow-color: 222 60% 2%;
   }

@@ -132,15 +132,7 @@ export function Sidebar({ role, counts }: { role: UserRole; counts: SidebarCount
 function Wordmark() {
   return (
     <span className="flex items-center gap-2.5">
-      <span className="grid h-8 w-8 place-items-center rounded-lg bg-sidebar-accent text-sm font-bold text-white">
-        R
-      </span>
-      <span className="leading-none">
-        <span className="block text-sm font-semibold text-white">{BRANDING.applicationName}</span>
-        <span className="mt-0.5 block text-2xs uppercase tracking-wider text-sidebar-muted">
-          {BRANDING.tagline}
-        </span>
-      </span>
+      <img src="/logo.png" alt="RCT Logo" className="h-10 object-contain drop-shadow-sm" />
     </span>
   );
 }

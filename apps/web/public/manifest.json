@@ -1,11 +1,11 @@
 {
-  "name": "RCT Application",
+  "name": "Ram Computer Technology",
   "short_name": "RCT App",
   "description": "Enterprise IT Service Management System",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0F172A",
-  "theme_color": "#0F172A",
+  "background_color": "#851010",
+  "theme_color": "#851010",
   "icons": [
     {
       "src": "/icons/icon-192.png",

@@ -24,15 +24,7 @@ export default async function LoginPage({
       {/* Brand panel - hidden on small screens so the form gets the space */}
       <aside className="relative hidden flex-col justify-between bg-sidebar p-10 text-sidebar-foreground lg:flex">
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-sidebar-accent text-base font-bold text-white">
-            R
-          </span>
-          <span className="leading-tight">
-            <span className="block font-semibold text-white">{BRANDING.applicationName}</span>
-            <span className="block text-xs uppercase tracking-wider text-sidebar-muted">
-              {BRANDING.tagline}
-            </span>
-          </span>
+          <img src="/logo.png" alt="RCT Logo" className="h-16 object-contain drop-shadow-sm" />
         </div>
 
         <div className="max-w-sm space-y-4">
@@ -50,10 +42,8 @@ export default async function LoginPage({
 
       <main id="main" className="flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm">
-          <div className="mb-8 lg:hidden">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-base font-bold text-primary-foreground">
-              R
-            </span>
+          <div className="mb-8 lg:hidden flex justify-center">
+            <img src="/logo.png" alt="RCT Logo" className="h-20 object-contain drop-shadow-md" />
           </div>
 
           <div className="mb-6 space-y-1">

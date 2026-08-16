@@ -6,7 +6,9 @@ import { z } from 'zod';
 import { isCustomer } from '@rct/types';
 
 import { getSession } from '@/lib/auth';
-import { createServerSupabase } from '@/lib/supabase/server';
+import { sendTemplatedEmail } from '@/lib/email/send';
+import { appUrl } from '@/lib/env';
+import { createServerSupabase, createAdminSupabase } from '@/lib/supabase/server';
 
 /**
  * Ticket creation.
@@ -118,6 +120,35 @@ export async function createTicket(input: unknown): Promise<CreateTicketResult> 
       return { ok: false, message: 'You do not have permission to raise a ticket for that company.' };
     }
     return { ok: false, message: 'Unable to create ticket. Please try again.' };
+  }
+
+  // --- Send Email Notification ---
+  try {
+    const adminSupabase = createAdminSupabase();
+    // Get customer company name
+    const { data: customer } = await adminSupabase
+      .from('customers')
+      .select('company_name, email')
+      .eq('id', customerId)
+      .single();
+
+    if (customer && customer.email) {
+      await sendTemplatedEmail({
+        templateCode: 'ticket_created',
+        to: [customer.email],
+        ticketId: data.id,
+        actorId: session.userId,
+        vars: {
+          customer_name: customer.company_name,
+          ticket_number: data.ticket_number,
+          subject: parsed.data.subject,
+          ticket_url: appUrl(`/portal/tickets/${data.id}`),
+        },
+      });
+    }
+  } catch (emailError) {
+    console.error('Failed to queue ticket creation email:', emailError);
+    // Non-fatal, proceed
   }
 
   revalidatePath('/tickets');
