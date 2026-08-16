@@ -1,24 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 
-import { BRANDING, landingPathForRole } from '@rct/types';
+import { BRANDING } from '@rct/types';
 
-import { LoginForm } from '@/components/forms/login-form';
-import { getSession } from '@/lib/auth';
+import { RegisterForm } from '@/components/forms/register-form';
 
-export const metadata: Metadata = { title: 'Sign in' };
+export const metadata: Metadata = { title: 'Sign up' };
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ next?: string }>;
-}) {
-  const session = await getSession();
-  if (session) redirect(landingPathForRole(session.profile.role));
-
-  const { next } = await searchParams;
-
+export default function RegisterPage() {
   return (
     <div className="grid min-h-dvh lg:grid-cols-2">
       {/* Brand panel - hidden on small screens so the form gets the space */}
@@ -37,11 +26,10 @@ export default async function LoginPage({
 
         <div className="max-w-sm space-y-4">
           <h2 className="text-2xl font-semibold leading-snug text-white text-balance">
-            One place for every service call, engineer and contract.
+            Join {BRANDING.applicationName}
           </h2>
           <p className="text-sm leading-relaxed text-sidebar-muted">
-            Raise and track complaints, dispatch engineers, monitor SLA performance and issue
-            signed service reports — from the office or from site.
+            Create an account to track complaints, dispatch engineers, and monitor SLA performance.
           </p>
         </div>
 
@@ -57,25 +45,18 @@ export default async function LoginPage({
           </div>
 
           <div className="mb-6 space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Create an account</h1>
             <p className="text-sm text-muted-foreground">
-              Use the email address your administrator registered.
+              Enter your details below to get started.
             </p>
           </div>
 
-          <LoginForm next={next} />
+          <RegisterForm />
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
-            Trouble signing in?{' '}
-            <Link href="/forgot-password" className="font-medium text-primary hover:underline">
-              Reset your password
-            </Link>
-          </p>
-
-          <p className="mt-2 text-center text-xs text-muted-foreground">
-            Don't have an account?{' '}
-            <Link href="/register" className="font-medium text-primary hover:underline">
-              Sign up
+            Already have an account?{' '}
+            <Link href="/login" className="font-medium text-primary hover:underline">
+              Sign in
             </Link>
           </p>
         </div>
