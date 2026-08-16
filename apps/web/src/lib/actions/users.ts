@@ -31,7 +31,7 @@ export async function createUser(data: {
   is_active?: boolean;
 }) {
   await requireAdmin();
-  const supabase = createAdminSupabase();
+  const supabase = await createAdminSupabase();
 
   // Create Auth User
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
@@ -71,7 +71,7 @@ export async function createUser(data: {
 
 export async function deleteUser(id: string) {
   await requireAdmin();
-  const supabaseAdmin = createAdminSupabase();
+  const supabaseAdmin = await createAdminSupabase();
 
   const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
 

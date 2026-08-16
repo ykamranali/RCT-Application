@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import ExcelJS from 'exceljs';
+import PDFDocument from 'pdfkit';
 
 import { createServerSupabase } from '@/lib/supabase/server';
 import { requireStaff } from '@/lib/auth';
@@ -10,80 +10,66 @@ export async function GET(req: NextRequest) {
     const supabase = await createServerSupabase();
     const type = req.nextUrl.searchParams.get('type') || 'tickets';
 
-    const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'RCT System';
-    workbook.lastModifiedBy = 'RCT System';
-    workbook.created = new Date();
-    workbook.modified = new Date();
+    // We stream the PDF output into a buffer so we can return it as a NextResponse
+    const pdfBuffer = await new Promise<Buffer>(async (resolve, reject) => {
+      try {
+        const doc = new PDFDocument({ margin: 30, size: 'A4', layout: 'landscape' });
+        const chunks: Buffer[] = [];
+        
+        doc.on('data', (chunk) => chunks.push(chunk));
+        doc.on('end', () => resolve(Buffer.concat(chunks)));
 
-    const sheet = workbook.addWorksheet('Export Data');
+        // Title
+        doc.fontSize(20).text(`RCT System Export: ${type.toUpperCase()}`, { align: 'center' });
+        doc.moveDown(2);
 
-    if (type === 'tickets') {
-      const { data } = await supabase.from('v_tickets_overview').select('*');
-      
-      sheet.columns = [
-        { header: 'Ticket Number', key: 'ticket_number', width: 20 },
-        { header: 'Subject', key: 'subject', width: 40 },
-        { header: 'Status', key: 'status', width: 15 },
-        { header: 'Priority', key: 'priority_code', width: 15 },
-        { header: 'Customer', key: 'customer_name', width: 30 },
-        { header: 'Engineer', key: 'assigned_engineer_name', width: 30 },
-        { header: 'Created At', key: 'created_at', width: 25 },
-        { header: 'Resolution State', key: 'resolution_state', width: 20 },
-      ];
+        if (type === 'tickets') {
+          const { data } = await supabase.from('v_tickets_overview').select('*');
+          
+          doc.fontSize(10);
+          
+          if (data && data.length > 0) {
+            // Write a simple list/table approximation
+            data.forEach((row: any, i: number) => {
+              if (doc.y > 500) doc.addPage();
+              doc.font('Helvetica-Bold').text(`Ticket: ${row.ticket_number} - ${row.subject}`);
+              doc.font('Helvetica').text(`Status: ${row.status} | Priority: ${row.priority_code} | SLA: ${row.resolution_state}`);
+              doc.text(`Customer: ${row.customer_name} | Assigned: ${row.assigned_engineer_name}`);
+              doc.text(`Created: ${new Date(row.created_at).toLocaleString()}`);
+              doc.moveDown(1);
+            });
+          } else {
+            doc.text('No tickets found.');
+          }
+        } else if (type === 'amc') {
+          const { data } = await supabase.from('v_amc_expiring').select('*');
+          
+          doc.fontSize(10);
+          
+          if (data && data.length > 0) {
+            data.forEach((row: any, i: number) => {
+              if (doc.y > 500) doc.addPage();
+              doc.font('Helvetica-Bold').text(`AMC: ${row.amc_number} - ${row.company_name}`);
+              doc.font('Helvetica').text(`Type: ${row.contract_type} | Status: ${row.status}`);
+              doc.text(`Start: ${row.start_date} | Expiry: ${row.expiry_date} | Remaining: ${row.days_remaining} days`);
+              doc.moveDown(1);
+            });
+          } else {
+            doc.text('No AMC contracts found.');
+          }
+        }
 
-      if (data) {
-        data.forEach((row: any) => {
-          sheet.addRow({
-            ticket_number: row.ticket_number,
-            subject: row.subject,
-            status: row.status,
-            priority: row.priority_code,
-            customer: row.customer_name,
-            engineer: row.assigned_engineer_name,
-            created_at: new Date(row.created_at).toLocaleString(),
-            resolution_state: row.resolution_state,
-          });
-        });
+        doc.end();
+      } catch (err) {
+        reject(err);
       }
-    } else if (type === 'amc') {
-      const { data } = await supabase.from('v_amc_expiring').select('*');
-      
-      sheet.columns = [
-        { header: 'AMC Number', key: 'amc_number', width: 20 },
-        { header: 'Customer', key: 'company_name', width: 30 },
-        { header: 'Contract Type', key: 'contract_type', width: 20 },
-        { header: 'Status', key: 'status', width: 15 },
-        { header: 'Start Date', key: 'start_date', width: 20 },
-        { header: 'Expiry Date', key: 'expiry_date', width: 20 },
-        { header: 'Days Remaining', key: 'days_remaining', width: 15 },
-      ];
+    });
 
-      if (data) {
-        data.forEach((row: any) => {
-          sheet.addRow({
-            amc_number: row.amc_number,
-            company_name: row.company_name,
-            contract_type: row.contract_type,
-            status: row.status,
-            start_date: row.start_date,
-            expiry_date: row.expiry_date,
-            days_remaining: row.days_remaining,
-          });
-        });
-      }
-    }
-
-    sheet.getRow(1).font = { bold: true };
-    sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E0E0' } };
-
-    const buffer = await workbook.xlsx.writeBuffer();
-
-    return new NextResponse(buffer, {
+    return new NextResponse(pdfBuffer as any, {
       status: 200,
       headers: {
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="${type}_export_${new Date().toISOString().split('T')[0]}.xlsx"`,
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${type}_export_${new Date().toISOString().split('T')[0]}.pdf"`,
       },
     });
   } catch (error: any) {

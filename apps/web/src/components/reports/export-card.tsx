@@ -18,7 +18,7 @@ export function ExportCard({ title, description, type }: { title: string; descri
       <CardContent>
         <Button onClick={handleExport} className="w-full sm:w-auto">
           <Download className="mr-2 h-4 w-4" />
-          Export to Excel
+          Export to PDF
         </Button>
       </CardContent>
     </Card>

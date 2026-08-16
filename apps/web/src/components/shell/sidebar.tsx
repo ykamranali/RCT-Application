@@ -8,6 +8,7 @@ import { Menu, X } from 'lucide-react';
 import { BRANDING, type UserRole } from '@rct/types';
 
 import { Button } from '@/components/ui/button';
+import { InstallPrompt } from '@/components/shell/install-prompt';
 import { homeHref, navigationForRole } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
 
@@ -118,6 +119,8 @@ export function Sidebar({ role, counts }: { role: UserRole; counts: SidebarCount
             </div>
           ))}
         </nav>
+
+        <InstallPrompt />
 
         <div className="border-t border-sidebar-border px-4 py-3">
           <p className="text-2xs leading-relaxed text-sidebar-muted">
