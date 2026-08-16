@@ -35,7 +35,7 @@ export async function registerUser(data: {
       if (!data.company_name) {
         throw new Error('Company name is required for customer registration.');
       }
-      // Create Customer
+      // 1. Create Customer
       const customerCode = `CUS-${Math.floor(Math.random() * 1000000)}`;
       const { data: customer, error: customerError } = await supabase
         .from('customers')
@@ -52,9 +52,49 @@ export async function registerUser(data: {
 
       if (customerError) throw customerError;
       customerId = customer.id;
-      
+
+      // 2. Create Profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          email: data.email,
+          full_name: data.full_name,
+          phone: data.phone || null,
+          role: data.role as UserRole,
+          is_active: true,
+          must_change_password: !data.password,
+          customer_id: customerId,
+        });
+
+      if (profileError) throw profileError;
+
+      // 3. Link Profile to Customer
+      await supabase.from('customer_users').insert({
+        customer_id: customerId,
+        profile_id: userId,
+        is_primary: true,
+      });
+
     } else if (data.role === 'engineer') {
-      // Create Employee
+      // For engineers, customer_id MUST be null, so we can create profile first
+      // 1. Create Profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          email: data.email,
+          full_name: data.full_name,
+          phone: data.phone || null,
+          role: data.role as UserRole,
+          is_active: false, // Engineers need admin approval
+          must_change_password: !data.password,
+          customer_id: null,
+        });
+
+      if (profileError) throw profileError;
+
+      // 2. Create Employee
       const employeeCode = `EMP-${Math.floor(Math.random() * 1000000)}`;
       const { data: employee, error: employeeError } = await supabase
         .from('employees')
@@ -72,32 +112,9 @@ export async function registerUser(data: {
 
       if (employeeError) throw employeeError;
       employeeId = employee.id;
-    }
 
-    // 2. Create Profile
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({
-        id: userId,
-        email: data.email,
-        full_name: data.full_name,
-        phone: data.phone || null,
-        role: data.role as UserRole,
-        is_active: data.role === 'customer_admin', // Engineers need admin approval
-        must_change_password: !data.password,
-        customer_id: customerId,
-        employee_id: employeeId,
-      });
-
-    if (profileError) throw profileError;
-
-    // 3. Link Profile to Customer/Employee if needed
-    if (data.role === 'customer_admin' && customerId) {
-      await supabase.from('customer_users').insert({
-        customer_id: customerId,
-        profile_id: userId,
-        is_primary: true,
-      });
+      // 3. Link Employee back to Profile
+      await supabase.from('profiles').update({ employee_id: employeeId }).eq('id', userId);
     }
 
     return { success: true, needsApproval: data.role === 'engineer' };
