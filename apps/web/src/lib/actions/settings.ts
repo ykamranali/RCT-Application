@@ -4,6 +4,13 @@ import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/auth';
 import { createServerSupabase } from '@/lib/supabase/server';
 
+export async function getSettings() {
+  await requireAdmin();
+  const supabase = await createServerSupabase();
+  const { data } = await supabase.from('system_settings').select('*');
+  return data ?? [];
+}
+
 export async function updateSetting(key: string, value: any) {
   await requireAdmin();
   const supabase = await createServerSupabase();
