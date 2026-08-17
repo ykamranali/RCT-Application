@@ -34,7 +34,7 @@ export function AssetForm({
     manufacturer: initialData?.manufacturer ?? '',
     model: initialData?.model ?? '',
     serial_number: initialData?.serial_number ?? '',
-    status: initialData?.status ?? 'active',
+    status: initialData?.status ?? 'IN_SERVICE',
     ip_address: initialData?.ip_address ?? '',
     mac_address: initialData?.mac_address ?? '',
     purchase_date: initialData?.purchase_date ?? '',
@@ -130,10 +130,11 @@ export function AssetForm({
               <Select value={values.status} onValueChange={(v) => set('status', v as any)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active (In Use)</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="maintenance">Under Maintenance</SelectItem>
-                  <SelectItem value="retired">Retired / End of Life</SelectItem>
+                  <SelectItem value="IN_SERVICE">In Service</SelectItem>
+                  <SelectItem value="STANDBY">Standby</SelectItem>
+                  <SelectItem value="IN_REPAIR">In Repair</SelectItem>
+                  <SelectItem value="RETIRED">Retired</SelectItem>
+                  <SelectItem value="DISPOSED">Disposed</SelectItem>
                 </SelectContent>
               </Select>
             </Field>

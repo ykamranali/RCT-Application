@@ -36,7 +36,7 @@ export function AmcForm({
     sla_plan_id: initialData?.sla_plan_id ?? '',
     start_date: initialData?.start_date ?? '',
     expiry_date: initialData?.expiry_date ?? '',
-    status: initialData?.status ?? 'active',
+    status: initialData?.status ?? 'ACTIVE',
     contract_value: String(initialData?.contract_value ?? ''),
     currency: initialData?.currency ?? 'AED',
     visits_included: String(initialData?.visits_included ?? ''),
@@ -134,9 +134,9 @@ export function AmcForm({
               <Select value={values.status} onValueChange={(v) => set('status', v as any)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="expired">Expired</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="ACTIVE">Active</SelectItem>
+                  <SelectItem value="EXPIRED">Expired</SelectItem>
+                  <SelectItem value="CANCELLED">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
             </Field>
